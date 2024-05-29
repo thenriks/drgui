@@ -1,11 +1,13 @@
 class GuiManager
-    attr_reader :tags
+    attr_reader :tags, :widgets
 
     def initialize(args)
         @args = args
         @widgets = []
         # tags of all clickable elements
         @tags = []
+        @mouse_down = false
+        @state_changed = false
     end
 
     def add_widget(w)
@@ -21,6 +23,46 @@ class GuiManager
         end
 
         return nil
+    end
+
+    # check hover and click events. Return clicked tags
+    def handle_events
+        events = []
+        
+        update_gui
+
+        for w in @widgets do
+            if @args.inputs.mouse.down
+                @mouse_down = true
+                @state_changed = true
+            elsif @args.inputs.mouse.up
+                @mouse_down = false
+            end
+
+            if @args.inputs.mouse.inside_rect?(w.rect)
+                if !@mouse_down && w.state == 2
+                    for t in w.tags do
+                        if @args.inputs.mouse.inside_rect?(t.rect)
+                            events << t
+                        end
+                    end
+                    w.state = 1
+                elsif !@mouse_down
+                    w.state = 1
+                    @state_changed = true
+                elsif @mouse_down && @state_changed
+                    w.state = 2
+
+                    @state_changed = false
+                end
+            else
+                w.state = 0
+            end
+        end
+
+#        update_gui
+
+        return events
     end
 
     def render
@@ -42,7 +84,7 @@ class GuiManager
             end
         end
 
-        print("\ntags: #{tags}\n")
+        #print("\ntags: #{tags}\n")
     end
 
     def draw_gui

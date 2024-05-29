@@ -8,17 +8,10 @@ def new_game args
 
 	args.state.gui ||= GuiManager.new(args)
 
-	# args.state.btnUp ||= Button.new(args, :buttonU, "u", 461, 636, 64, 64, 180, 180, 180)
-	# args.state.btnUp.draw
-	# args.state.gui.add_widget(args.state.btnUp)
-
-	# args.state.btnDown ||= Button.new(args, :buttonD, "D", 461, 500, 64, 64, 180, 180, 180)
-	# args.state.btnDown.draw
-	# args.state.gui.add_widget(args.state.btnDown)
-	btnUp = Button.new(args, :buttonU, "U", 461, 636, 64, 64, 180, 180, 180)
-	args.state.gui.add_widget(btnUp)
-	btnDown = Button.new(args, :buttonD, "D", 461, 500, 64, 64, 180, 180, 180)
-	args.state.gui.add_widget(btnDown)
+	args.state.btnUp ||= Button.new(args, :buttonU, "U", 461, 636, 64, 64, 180, 180, 180)
+	args.state.gui.add_widget(args.state.btnUp)
+	args.state.btnDown = Button.new(args, :buttonD, "D", 461, 500, 64, 64, 180, 180, 180)
+	args.state.gui.add_widget(args.state.btnDown)
 
 	args.state.main_text ||= TextBox.new(args, :main_text)
 	args.state.main_text.set_position(15, 700)
@@ -37,31 +30,30 @@ def tick args
        new_game(args)
     end
 
-	args.state.gui.draw_gui
+	# for b in args.state.main_text.tags do
+	# 	args.outputs.borders << b[:rect]
+	# end
 
-	for b in args.state.main_text.tags do
-		args.outputs.borders << b[:rect]
-	end
+	atags = args.state.gui.handle_events
+	
+	if atags.any?
+		for t in atags do
+			#print ("\nWidget: #{t[:widget]} Type: #{t[:type]} Tag: #{t[:tag]}\n")
+			#print("\n #{t} \n")
 
-	if args.inputs.mouse.click
-		args.gtk.notify! "x: #{args.inputs.mouse.click.x} y: #{args.inputs.mouse.click.y}"
-		for t in args.state.gui.tags do
-		 	if args.inputs.mouse.inside_rect? t[:rect]
-		 		args.gtk.notify! "Widget: #{t[:widget]} Type: #{t[:type]} Tag: #{t[:tag]}"
-
-				if t[:type] == :button
-					case t[:tag]
-					when :buttonU
-						args.state.main_text.scroll_up
-						args.state.gui.update_gui()
-					when :buttonD
-						args.state.main_text.scroll_down
-						args.state.gui.update_gui()
-					end
+			if t[:type] == :button
+				if t[:tag] == :buttonU
+					args.state.main_text.scroll_up
+				elsif t[:tag] == :buttonD
+					args.state.main_text.scroll_down
 				end
-		 	end
+			elsif t[:type] == :link
+				args.gtk.notify! "Widget: #{t[:widget]} Type: #{t[:type]} Tag: #{t[:tag]}"
+			end
 		end
 	end
+
+	args.state.gui.draw_gui
 
 	if args.inputs.keyboard.key_down.up
 		args.state.main_text.scroll_up
@@ -74,6 +66,12 @@ def tick args
 		w.add_wrapped("qwerty asdfg zxcvb")
 		args.state.gui.update_gui()
 		#print("\n #{w} \n")
+	elsif args.inputs.keyboard.key_down.t
+		print("\n #{atags} \n")
+	elsif args.inputs.keyboard.key_down.w
+		for w in args.state.gui.widgets do
+			print("\n #{w.name}")
+		end
 	end
 		
 end

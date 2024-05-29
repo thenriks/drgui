@@ -2,7 +2,7 @@ require "app/widget.rb"
 
 class TextBox < Widget
 	attr_gtk
-	attr_reader :tags, :target
+	attr_reader :tags, :target, :x, :y
 
 	def initialize(args, name)
 		@args = args
@@ -25,6 +25,18 @@ class TextBox < Widget
 		@background_h = 200
 		@background_w = 450
 		@border = 10
+	end
+
+	def rect
+        return {x: @x, y: @y - @background_h, w: @background_w, h: @background_h}
+    end
+
+	def w
+		return @background_w
+	end
+
+	def h
+		return @background_h
 	end
 
 	def set_size(w, h)
@@ -126,7 +138,6 @@ class TextBox < Widget
 			xoff = 0
 			for l in elements do
 				w, h = @args.gtk.calcstringbox(l.text, @size, "font.ttf")
-				
 
 				if l.type == :link
 					@labels << {x: @x + xoff + @border, y: @y - @border - (i * @spacing), text: l.text, size_enum: @size, b: 200}
@@ -219,7 +230,10 @@ class TextBox < Widget
 
 	def render()
 		@target = @name
-		@args.render_target(@name).solids << {x: @x, y: @y - @background_h, w: @background_w, h: @background_h, r: 200, g: 200, b: 200}
-		@args.render_target(@name).labels << @labels
+		#@args.render_target(@name).solids << {x: @x, y: @y - @background_h, w: @background_w, h: @background_h, r: 200, g: 200, b: 200}
+		#@args.render_target(@name).labels << @labels
+		@args.outputs[@name].transient!
+		@args.outputs[@name].solids << {x: @x, y: @y - @background_h, w: @background_w, h: @background_h, r: 200, g: 200, b: 200}
+		@args.outputs[@name].labels << @labels
 	end
 end
