@@ -13,6 +13,16 @@ class GuiManager
         update_gui
     end
 
+    def get_widget(s)
+        for w in @widgets do
+            if w.name == s
+                return w
+            end
+        end
+
+        return nil
+    end
+
     def render
         for w in @widgets do
             w.render

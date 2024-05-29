@@ -8,16 +8,20 @@ def new_game args
 
 	args.state.gui ||= GuiManager.new(args)
 
-	args.state.btnUp ||= Button.new(args, :buttonU, "u", 456, 636, 64, 64, 180, 180, 180)
-	args.state.btnUp.draw
-	args.state.gui.add_widget(args.state.btnUp)
+	# args.state.btnUp ||= Button.new(args, :buttonU, "u", 461, 636, 64, 64, 180, 180, 180)
+	# args.state.btnUp.draw
+	# args.state.gui.add_widget(args.state.btnUp)
 
-	args.state.btnDown ||= Button.new(args, :buttonD, "D", 456, 500, 64, 64, 180, 180, 180)
-	args.state.btnDown.draw
-	args.state.gui.add_widget(args.state.btnDown)
+	# args.state.btnDown ||= Button.new(args, :buttonD, "D", 461, 500, 64, 64, 180, 180, 180)
+	# args.state.btnDown.draw
+	# args.state.gui.add_widget(args.state.btnDown)
+	btnUp = Button.new(args, :buttonU, "U", 461, 636, 64, 64, 180, 180, 180)
+	args.state.gui.add_widget(btnUp)
+	btnDown = Button.new(args, :buttonD, "D", 461, 500, 64, 64, 180, 180, 180)
+	args.state.gui.add_widget(btnDown)
 
 	args.state.main_text ||= TextBox.new(args, :main_text)
-	args.state.main_text.set_position(10, 700)
+	args.state.main_text.set_position(15, 700)
 	args.state.gui.add_widget(args.state.main_text)
 
 	args.state.main_text.add_wrapped("Lorem [tag1]ipsum dolor sit amet, consectetur adipiscing elitteger dolor [tag2]velit, [tag3]ultricies vitae libero vel, aliquam [tag4]imperdiet enim.")
@@ -40,6 +44,7 @@ def tick args
 	end
 
 	if args.inputs.mouse.click
+		args.gtk.notify! "x: #{args.inputs.mouse.click.x} y: #{args.inputs.mouse.click.y}"
 		for t in args.state.gui.tags do
 		 	if args.inputs.mouse.inside_rect? t[:rect]
 		 		args.gtk.notify! "Widget: #{t[:widget]} Type: #{t[:type]} Tag: #{t[:tag]}"
@@ -64,6 +69,11 @@ def tick args
 	elsif args.inputs.keyboard.key_down.down
 		args.state.main_text.scroll_down
 		args.state.gui.update_gui()
+	elsif args.inputs.keyboard.key_down.i
+		w = args.state.gui.get_widget(:main_text)
+		w.add_wrapped("qwerty asdfg zxcvb")
+		args.state.gui.update_gui()
+		#print("\n #{w} \n")
 	end
 		
 end
